@@ -101,6 +101,7 @@ implemente en Python o .NET. Qué hace cada operación está en [`spec.md`](spec
 |---|---|---|---|
 | GET | `/books` | autenticado | Búsqueda: `q`, `category_id`, `page`, `size` |
 | GET | `/books/{id}` | autenticado | Detalle |
+| GET | `/books/{id}/cover` | autenticado | Devuelve la portada binaria o 404 si no existe |
 | POST | `/books` | admin | Crea |
 | PUT | `/books/{id}` | admin | Reemplaza título, autor, categoría y total |
 | DELETE | `/books/{id}` | admin | Baja lógica |
@@ -118,6 +119,7 @@ Libro (respuesta):
 ```
 
 `POST /books` (petición): `title`, `author`, `isbn`, `category_id`, `total_copies`. Los disponibles los calcula el servidor.
+`PUT /books/{id}` (petición): `title`, `author`, `category_id`, `total_copies`; todos son obligatorios. El `isbn` no forma parte de la actualización y conserva su valor original. Los disponibles los ajusta el servidor según la diferencia del total.
 `cover_key` es una clave opaca: para pintar la portada se usa `GET /books/{id}/cover`, que devuelve el binario o 404.
 
 ### 3.5 Socios
@@ -137,6 +139,8 @@ Libro (respuesta):
 | GET | `/loans/{id}` | admin, librarian | Detalle con líneas y estado |
 | POST | `/loans/{loan_id}/items/{item_id}/return` | admin, librarian | Devuelve una línea |
 | GET | `/loans/overdue` | admin, librarian | Líneas vencidas |
+
+Las rutas estáticas, como `/loans/overdue`, deben resolverse antes que las rutas parametrizadas, como `/loans/{id}`. El valor `overdue` no debe interpretarse como un identificador de préstamo.
 
 `POST /loans`
 

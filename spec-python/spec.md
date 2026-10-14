@@ -42,6 +42,7 @@ Como usuario quiero autenticarme para operar según mi rol.
 ### HU-03 · Gestionar libros (admin)
 - **CA-03.1** Crear libro con título, autor, ISBN, categoría y total de ejemplares. Los disponibles arrancan iguales al total.
 - **CA-03.2** El ISBN tiene 13 dígitos y es único entre libros activos. Repetido: 409.
+- **CA-03.2a** El ISBN se define al crear el libro y es inmutable. La actualización de un libro no lo reemplaza.
 - **CA-03.3** Total de ejemplares ≥ 1. Cambiar el total ajusta los disponibles en la misma diferencia y **nunca** deja disponibles < 0 (422).
 - **CA-03.4** Subir portada (JPG/PNG, máx. 2 MB) guarda una **clave opaca**; sin portada el campo es `null`, nunca cadena vacía.
 - **CA-03.5** Eliminar un libro es **baja lógica**: deja de aparecer en el catálogo pero sigue en los préstamos pasados. Un libro con préstamos abiertos no se da de baja (409).

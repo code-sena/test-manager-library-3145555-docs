@@ -3,8 +3,10 @@
 - **Estado:** aceptada
 - **Contexto:** dos bibliotecarios pueden prestar el **último ejemplar** del mismo libro al mismo tiempo (RNF-2). Si ambos leen
   `available_copies = 1` y ambos escriben, el sistema presta un libro que no tiene.
-- **Decisión:** control de concurrencia **optimista**. El libro lleva un testigo de versión; al guardar, si la versión cambió, la
-  operación falla y el servidor responde **409 `BOOK_NOT_AVAILABLE`** (o reintenta una vez si el ejemplar sigue disponible).
+- **Decisión:** control de concurrencia **optimista**. El libro lleva la columna `version`, inicializada en `0` por el dominio y sin
+  `DEFAULT` en la base. Cada actualización de existencias usa una operación compare-and-swap: actualiza el libro solo cuando el
+  `id` y la `version` leída coinciden, y aumenta `version` en uno dentro de la misma transacción. Si ninguna fila se actualiza porque
+  la versión cambió, la operación falla y el servidor responde **409 `BOOK_NOT_AVAILABLE`** (o reintenta una vez si el ejemplar sigue disponible).
   La **última barrera** es el `CHECK` `ck_book_available_range` (`0 <= available_copies <= total_copies`).
 - **Alternativas descartadas:** bloqueo pesimista de la fila (`SELECT … FOR UPDATE`) en cada préstamo: serializa toda la biblioteca por
   un caso raro; contador en memoria: no sobrevive a más de un proceso.

@@ -67,10 +67,11 @@ Ninguna columna lleva `DEFAULT`: los valores los pone el dominio.
 | `id` | `uuid` | no | PK |
 | `title` | `varchar(250)` | no | Recortado por el dominio |
 | `author` | `varchar(200)` | no | |
-| `isbn` | `char(13)` | no | Solo dígitos. Único entre libros activos (índice parcial) |
+| `isbn` | `char(13)` | no | Solo dígitos. Inmutable después de crear el libro. Único entre libros activos (índice parcial) |
 | `category_id` | `uuid` | no | FK restrictiva a `category` |
 | `total_copies` | `integer` | no | ≥ 1 |
 | `available_copies` | `integer` | no | Entre 0 y `total_copies` |
+| `version` | `integer` | no | Testigo de concurrencia optimista; inicia en 0 y aumenta en cada actualización de existencias; sin `DEFAULT` |
 | `cover_key` | `varchar(512)` | **sí** | Clave opaca; nunca ruta ni bytes; nunca cadena vacía |
 | `deleted_at` | `timestamptz` | sí | Baja lógica. Nula = activo |
 
@@ -131,6 +132,7 @@ porque ningún requisito las pide.
 | `loan_item.loan_id` → `loan.id` CASCADE | FK | **motor** |
 | `loan_item.book_id` → `book.id` RESTRICT | FK | **motor** |
 | `0 <= available_copies <= total_copies` | `ck_book_available_range` | **motor** — última barrera de concurrencia |
+| `version >= 0` | `ck_book_version_nonnegative` | **motor** |
 | `total_copies >= 1` | `ck_book_total_positive` | **pendiente (T-18)** · hoy solo dominio |
 | Único `(loan_id, book_id)` | índice único | **motor** |
 | `role` en (`admin`,`librarian`) | `ck_user_role` | **pendiente (T-18)** · hoy solo dominio |
