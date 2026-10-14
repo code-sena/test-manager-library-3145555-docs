@@ -54,6 +54,9 @@ Antes de implementar en este fork, leer la [auditoría documental](auditoria-doc
 [adaptación a React y Laravel](adaptacion-react-laravel.md). Registran correcciones y decisiones
 pendientes sin modificar el alcance del producto ni renombrar entidades.
 
+El cierre propuesto de esos puntos está en [decisiones previas a la implementación](decisiones-previas.md).
+Una decisión documentada no equivale a una tarea de código terminada ni a una prueba ejecutada.
+
 En cualquiera de las dos carpetas, en este orden:
 
 1. `constitution.md` — principios innegociables.

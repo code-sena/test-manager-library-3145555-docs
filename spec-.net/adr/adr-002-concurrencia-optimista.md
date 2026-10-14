@@ -11,3 +11,13 @@
 - **Consecuencias:** si el `CHECK` salta, **algo escribió fuera del adaptador**: es un defecto, no un caso de negocio. Devolver dos veces
   la misma línea no suma dos veces porque `returned_at` ya está lleno (CA-07.2).
 - **Cómo se verifica:** prueba concurrente con dos peticiones simultáneas sobre un libro con un ejemplar: exactamente una recibe 201.
+
+## Precisión de implementación para el reto
+
+El testigo es `book.xmin::text`, metadato nativo de PostgreSQL, sin columna nueva ni exposición HTTP.
+La comparación se aplica a la escritura del libro. El CHECK sigue siendo barrera de integridad;
+no sustituye la comparación y no detecta por sí solo una devolución doble con otras copias prestadas.
+El protocolo completo está en [C-01 a C-03](../../decisiones-previas.md): transacción, coordinación por
+socio, lectura posterior al bloqueo, devolución condicional y reintento completo acotado.
+La coordinación consultiva por socio no sustituye la decisión optimista para los libros.
+T-13 debe probar último ejemplar, límite concurrente por socio y devolución simultánea.

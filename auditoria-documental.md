@@ -18,6 +18,8 @@ No existe todavía una aplicación ni una base implementada para contrastar el m
 ## Hallazgos y disposición
 
 Las referencias de la tabla existen en ambas versiones, salvo donde se indica lo contrario.
+Esta tabla conserva las disposiciones iniciales del PR #1; el estado vigente de cierre
+se registra al final para distinguir la detección original de las decisiones posteriores.
 
 | ID | Evidencia | Consecuencia | Disposición |
 |---|---|---|---|
@@ -37,6 +39,7 @@ Las referencias de la tabla existen en ambas versiones, salvo donde se indica lo
 | D-14 | README exige React y Laravel; ambos planes usan frameworks, herramientas de prueba y rutas de otro stack | Copiar la tecnología del spec incumpliría el reto | Añadir guía de adaptación y mantener los specs de referencia; pendiente fijar versiones y herramientas antes del código |
 | D-15 | T-01 habla de arranque en contenedor antes de T-20; T-20 exige frontend, pero solo depende de T-17 | La secuencia no distingue API mínima, sistema integrado y frontend terminado | Aclarar evidencia de T-01 y añadir T-22 como dependencia de T-20; no reducir RNF-5 |
 | D-16 | `architecture.md` atribuye documento único a `Member`, pero la unicidad depende del repositorio y restricción del motor | Un objeto aislado no puede garantizar unicidad global | Pendiente: aclarar responsabilidad dominio/aplicación/motor sin retirar la unicidad de CA-05.1 |
+| D-17 | Constitución Art. VI exige imponer las invariantes expresables en la base; modelo §4 omite ISBN de 13 dígitos, título/documento obligatorios, usuario normalizado y portada no vacía | T-18 con solo total y rol no completa las invariantes ya requeridas | Hallazgo de segunda revisión: añadir las restricciones como pendientes de T-18, sin columnas nuevas ni cambio de reglas |
 
 ## Singular y plural: reportar sin renombrar
 
@@ -60,16 +63,40 @@ Los valores predeterminados de un futuro ORM no son evidencia de un defecto actu
 - Una revisión documental no acredita pruebas de API, concurrencia, seguridad, rendimiento ni arranque.
 - Esta lista registra hallazgos verificables; no garantiza que no existan más defectos ni identifica la intención del autor.
 
-## Condición para iniciar código
+## Estado de cierre documental
 
 **Correcciones documentales aplicadas:** D-01, D-02, D-03, D-10, la trazabilidad de D-11 y D-15,
-en ambas versiones. La guía `adaptacion-react-laravel.md` registra el mapa de responsabilidades
-de D-14; las versiones de herramientas y las rutas concretas siguen pendientes.
+en ambas versiones. La guía `adaptacion-react-laravel.md` registra ahora versiones elegidas,
+mapa concreto de carpetas y punto de composición para D-14.
 
-**Verificación documental:** enlaces locales válidos; `spec.md`, `api-contract.md` y `data-model.md`
-equivalentes entre versiones; `spec.md`, las constituciones y los cuatro ADR sin cambios frente
-a la base. Se conservaron las seis tablas, columnas, rutas y nombres de carpetas.
+**Verificación del PR #1:** enlaces locales válidos; `spec.md`, `api-contract.md` y `data-model.md`
+equivalentes entre versiones; `spec.md`, las constituciones y los cuatro ADR sin cambios entonces
+frente a la base. Se conservaron las seis tablas, columnas, rutas y nombres de carpetas.
 
-Resolver y documentar D-04 a D-09, D-12 y D-16 antes de programar los componentes afectados.
-La incoherencia de rutas D-13 y las observaciones de singular/plural quedan reportadas sin movimiento.
-Mientras existan estas decisiones pendientes, la documentación no se declara completamente cerrada.
+| Hallazgo | Cierre en esta rama | Evidencia de implementación futura |
+|---|---|---|
+| D-04 | C-01: `xmin` nativo, sin columna añadida; precisión en modelo y ADR-002 | T-13 |
+| D-05 | C-02: transacción y coordinación por socio; conserva libros optimistas | T-13 |
+| D-06 | C-03: transición condicional de línea y reposición atómica | T-13/T-16 |
+| D-07 | C-04: reloj fijo de demo aislado y creación exclusivamente por API | T-21 |
+| D-08 | C-05: interpretación con las claves congeladas de contrato y ADR-004 existentes | T-11 |
+| D-09 | C-06: HTTPS, hash Argon2id y evidencia sin secretos | T-14/T-16/T-20 |
+| D-11 | C-07: 5.000 libros, medición reproducible, cada muestra menor de 300 ms | RNF-1/T-21 |
+| D-12 | Contrato §5: cuerpos, sobres, fechas, conteos, errores técnicos y binario de portada | T-16 |
+| D-13 | Reportado sin mover ni renombrar las referencias; mapa Laravel explícito | T-19 |
+| D-14 | Versiones, dependencias y carpetas de la guía de adaptación | T-01/T-19 |
+| D-16 | C-08: validación local, consulta y UNIQUE como última barrera | T-06/T-12/T-16 |
+| D-17 | CHECK adicionales de reglas existentes documentados pendientes en modelo y T-18 | T-18 |
+
+Los detalles están en [decisiones previas](decisiones-previas.md). Las observaciones de
+singular/plural quedan reportadas sin renombramientos. `spec.md` y las constituciones permanecen
+intactos; ADR-002 incorpora precisiones técnicas y conserva la decisión optimista.
+
+La base documental queda propuesta para revisión del siguiente PR. No se declara evidencia
+ejecutable: todas las tareas de producto siguen pendientes. La ejecución requiere PHP/Composer
+en el runtime previsto y servidor Docker disponible; el entorno local aún no los acredita.
+
+Comprobaciones de esta segunda revisión: enlaces locales válidos en los 28 documentos;
+contrato, modelo y ADR-002 iguales entre versiones; `spec.md` y constituciones intactos frente
+al merge `6f75d35`; tablas y columnas del modelo físico y tabla de rutas originales conservadas;
+23 tareas sin ciclos ni dependencias inexistentes. No se ejecutaron pruebas de producto.

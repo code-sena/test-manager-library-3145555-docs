@@ -120,6 +120,13 @@ Ninguna columna lleva `DEFAULT`: los valores los pone el dominio.
 Reglas transversales: **todas las marcas de tiempo son `timestamptz`**; **no hay columnas de auditoría** (`created_at`/`updated_at`)
 porque ningún requisito las pide.
 
+### 3.1. Metadatos de concurrencia
+
+El testigo de versión de `book` es `xmin::text`, columna de sistema de PostgreSQL, leída y
+comparada por el adaptador durante una operación. No es una séptima tabla ni una columna
+adicional de usuario, no lleva DEFAULT y no se expone por HTTP. No se persiste fuera de la
+operación. El protocolo y sus límites están en [C-01](../decisiones-previas.md).
+
 ## 4. Restricciones e índices: dónde vive cada regla
 
 | Regla | Objeto | Marca |
@@ -141,6 +148,11 @@ porque ningún requisito las pide.
 | Máximo 3 sin devolver por socio | — | **solo dominio** (no expresable en un `CHECK`) |
 | Socio con vencidos no pide | — | **solo dominio** |
 | Descontar ejemplar y crear línea son una operación | — | **solo dominio** (una transacción) |
+| ISBN de 13 dígitos en `book` y valor congelado en `loan_item` | `ck_book_isbn_digits`, `ck_loan_item_isbn_digits` | **pendiente (T-18)**; se conserva CA-03.2, sin validación adicional de checksum |
+| Título no vacío tras recortar | `ck_book_title_nonempty` | **pendiente (T-18)**; invariante ya descrita en arquitectura |
+| `cover_key` nula o no vacía | `ck_book_cover_key_nonempty` | **pendiente (T-18)**; CA-03.4 |
+| Nombre de usuario minúsculo, recortado y no vacío | `ck_user_username_normalized` | **pendiente (T-18)**; CA-02.2 |
+| Documento de socio no vacío tras recortar | `ck_member_document_nonempty` | **pendiente (T-18)**; documento obligatorio |
 | Un préstamo tiene 1 a 3 líneas | — | **solo dominio** |
 | Préstamos y devoluciones inmutables salvo `returned_at` | — | **solo dominio** (por ausencia de operación) |
 

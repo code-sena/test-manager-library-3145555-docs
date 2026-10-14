@@ -45,3 +45,10 @@ Cómo se construye lo que dicen [`spec.md`](spec.md) y [`constitution.md`](const
 
 Esqueleto y salud → migración inicial con semilla → dominio → casos de uso con fakes → adaptadores → API → pruebas de contrato y concurrencia.
 El detalle, con evidencia, está en [`tasks.md`](tasks.md).
+
+## 5. Decisiones de implementación del reto
+
+El stack efectivo, versiones y carpetas están en [adaptación React/Laravel](../adaptacion-react-laravel.md).
+El testigo nativo, protocolo por socio, devolución atómica, reloj de demostración, transporte y
+medición se documentan en [decisiones previas](../decisiones-previas.md). Este plan conserva sus
+herramientas de referencia; las nuevas precisiones rigen la adaptación, sin alterar el producto.
