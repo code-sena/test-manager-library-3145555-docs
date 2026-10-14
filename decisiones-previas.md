@@ -147,9 +147,18 @@ la fuente de verdad HTTP. Las versiones y el mapa concreto se registran en
 [adaptacion-react-laravel.md](adaptacion-react-laravel.md), sin copiar el esquema ni las rutas.
 No se atribuye una funcionalidad nueva a un detalle de serialización o manejo de errores.
 
+## C-10 · Restricciones de reglas existentes (D-17)
+
+La segunda revisión detecta invariantes ya descritas que no figuraban en la lista de restricciones.
+Se registran como pendientes de T-18: ISBN de 13 dígitos en libro/línea, título no vacío,
+portada nula o no vacía, usuario normalizado y documento obligatorio. T-18 conserva también
+total positivo y rol válido. No se cambia la estructura de tablas ni se añade validación de
+checksum ISBN. Las expresiones SQL exactas y su evidencia vivirán en las migraciones de `api`;
+el inventario de reglas permanece en `data-model.md`, sin prometer aplicación actual en el motor.
+
 ## Estado para continuar
 
-Los hallazgos D-04 a D-09, D-11, D-12, D-14 y D-16 tienen decisiones documentales.
+Los hallazgos D-04 a D-09, D-11, D-12, D-14, D-16 y D-17 tienen decisiones documentales.
 D-13 y las observaciones singular/plural permanecen reportadas sin movimientos.
 La aceptación del PR fija esta base documental; no acredita ninguna tarea de implementación.
 Antes de ejecutar pruebas debe estar disponible el runtime previsto y el motor de Docker:

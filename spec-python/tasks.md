@@ -16,12 +16,12 @@ Cada tarea termina cuando su **evidencia** existe y se puede ejecutar (artículo
 | T-10 | Casos de uso **devolver**, **consultar/listar préstamos** y **vencidos** | T-09 | HU-07, HU-08 y HU-09; devolver dos veces → `ITEM_ALREADY_RETURNED` |
 | T-11 | Caso de uso **reporte de más prestados** y su puerto de lectura | T-09 | HU-10; el título viejo se conserva tras renombrar (ADR-004) |
 | T-12 | Adaptador de persistencia: repositorios de libro, socio, usuario | T-02, T-06, T-07, T-08 | Pruebas de integración contra PostgreSQL real |
-| T-13 | Adaptador de persistencia: repositorio de préstamos + testigo de versión | T-12, T-09, T-10 | Dos préstamos del último ejemplar: uno 201, otro 409 (RNF-2) |
+| T-13 | Adaptador de persistencia: repositorio de préstamos + testigo de versión | T-12, T-09, T-10 | Último ejemplar: uno 201 y otro 409; límite concurrente por socio y devolución simultánea según C-01 a C-03 |
 | T-14 | Adaptador de seguridad: hash de claves y token JWT | T-07 | La clave nunca aparece en logs ni respuestas (RNF-3) |
 | T-15 | Adaptador de portadas (disco) | T-08 | Subir PNG de 2 MB ok; 3 MB → 422; sin portada → `cover_key` nulo |
 | T-16 | Adaptador HTTP: rutas de [`api-contract.md`](api-contract.md), cuerpo de error único, autorización por rol | T-07, T-08, T-10, T-11, T-13, T-14, T-15 | Prueba de contrato recorre todas las rutas y todos los códigos de §2 |
 | T-17 | Composición y arranque (admin inicial desde entorno) | T-16 | El sistema arranca con la base vacía y se puede iniciar sesión como admin |
-| T-18 | Bajar a la base las invariantes **solo dominio**: `ck_book_total_positive`, `ck_user_role` | T-12 | Un `INSERT` por `psql` que las viole falla; `data-model.md` §4 se actualiza |
+| T-18 | Bajar a la base las invariantes pendientes de `data-model.md` §4 (total, rol, ISBN, título, portada, usuario y documento) | T-12 | Un `INSERT` por `psql` que las viole falla; `data-model.md` §4 se actualiza |
 | T-19 | Pruebas de arquitectura (artículos I, II y III) | T-17 | un contrato de `import-linter` y un test en `tests/architecture/` pasa y falla si se introduce una importación prohibida |
 | T-20 | `infra`: `docker compose up` levanta motor vacío, API y frontend | T-17, T-22 | Un comando; la base arranca sin tablas hasta correr las migraciones |
 | T-21 | `tool`: sembrador de demostración **por la API** (≥ 40 libros, 10 socios, 15 préstamos, 3 vencidos) | T-17 | Tras correrlo, `/loans/overdue` devuelve 3 líneas y el reporte tiene filas |
@@ -37,5 +37,9 @@ el desempeño con SDD, no la cantidad de tareas: una tarea con evidencia vale m�
 
 T-21 prepara también el escenario de RNF-1 con 5.000 libros creados por la API; 40 libros solo acreditan
 la demostración. La medición debe documentar entorno, consultas y resultados antes de declarar RNF-1 cumplido.
-La definición de la medición y la creación inmediata de tres vencidos permanecen pendientes en la
-[auditoría documental](../auditoria-documental.md) (D-07 y D-11). No se amplía el contrato para satisfacer el sembrador.
+La medición y la creación de tres vencidos están definidas en C-07 y C-04 de
+[decisiones previas](../decisiones-previas.md). No se amplía el contrato para satisfacer el sembrador.
+
+
+Todas las tareas conservan estado pendiente hasta disponer de su evidencia ejecutable.
+Las precisiones de documentación no acreditan T-13, T-18, T-20 ni T-21.

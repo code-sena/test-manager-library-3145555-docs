@@ -48,7 +48,7 @@ src/Library/
 |---|---|---|
 | `Book` | `Isbn`, copias totales y disponibles, baja lógica | disponibles entre 0 y total; total ≥ 1; título no vacío |
 | `Loan` | colección de `LoanItem` | 1 a 3 líneas; sin libro repetido; vencimiento a 14 días; inmutable salvo devolución |
-| `Member` | documento | documento obligatorio y único |
+| `Member` | documento | documento obligatorio; unicidad global coordinada por aplicación y motor |
 | `User` | rol, hash | nombre normalizado; rol en (`admin`, `librarian`) |
 
 `Loan.AddItem` llama a `Book.Withdraw` antes de añadir la línea: descontar el ejemplar y crear la línea son **una sola operación**.
@@ -84,3 +84,13 @@ traduce al cuerpo único y al código de estado de [`api-contract.md`](api-contr
 ## 6. Qué no hay
 
 Sin eventos, sin colas, sin caché, sin microservicios, sin multi-tenencia. Se añaden si un requisito lo pide, no antes.
+
+## 7. Precisiones de la adaptación
+
+La unicidad de documentos no puede garantizarla un objeto `Member` aislado: la aplicación
+consulta y el índice UNIQUE de la base arbitra altas concurrentes, según [C-08](../decisiones-previas.md).
+El límite de tres líneas por préstamo pertenece a `Loan`; el límite total sin devolver del
+socio requiere consultar todos sus préstamos, según [C-02](../decisiones-previas.md).
+El protocolo completo de prestar/devolver es [C-01 a C-03](../decisiones-previas.md).
+El mapa coherente para Laravel está en [la adaptación](../adaptacion-react-laravel.md).
+La estructura de referencia se conserva; sus inconsistencias de rutas se reportan en D-13.

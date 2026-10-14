@@ -2,7 +2,8 @@
 
 Esta guía traduce responsabilidades técnicas del spec. No modifica el alcance de `spec.md` §2,
 los actores, las historias, las reglas de negocio, las seis entidades ni el contrato HTTP.
-Las decisiones no resueltas se registran en [la auditoría](auditoria-documental.md).
+El cierre de los hallazgos se registra en [decisiones previas](decisiones-previas.md)
+y su trazabilidad en [la auditoría](auditoria-documental.md).
 
 ## Referencias y responsabilidades
 
@@ -17,12 +18,12 @@ Los modelos y el contrato siguen en sus archivos originales, sin una tercera cop
 | Casos de uso y puertos | Aplicación en PHP, contratos definidos por quien los consume | Pruebas con implementaciones falsas, sin infraestructura |
 | SQLAlchemy / EF Core | Adaptador de persistencia sobre PostgreSQL 16 | Integración real y restricciones de `data-model.md` |
 | Alembic / migraciones EF | Migraciones de Laravel en `api` | Seis tablas, índices, restricciones y semilla de categorías; `infra` sin DDL |
-| Composición de puertos | Un punto explícito de composición y registro de dependencias en Laravel | Se documenta su ruta antes de crear la estructura; pruebas de dependencias |
-| Argon2id / BCrypt | Hash detrás de `PasswordHasher` | Decisión del algoritmo registrada antes de implementar; hashes fuera de respuestas/logs |
+| Composición de puertos | `app/Providers/LibraryServiceProvider.php` | Único punto de unión de puertos y adaptadores; pruebas de dependencias |
+| Argon2id / BCrypt | Argon2id detrás de `PasswordHasher` | Soporte del runtime comprobado al construir; hashes fuera de respuestas/logs |
 | Emisión de JWT | Adaptador detrás de `TokenIssuer` | HS256, 8 horas, `sub` y `role`, secreto de entorno |
 | Reloj del sistema | Adaptador de `Clock` | UTC; vencimientos probados sin esperar 14 días |
 | Portadas | Adaptador de `CoverStorage` | Validación de contenido, límite de 2 MB, clave opaca y orden de borrado |
-| pytest / xUnit / pruebas de arquitectura | Herramientas de prueba compatibles con el entorno PHP elegido | Evidencias equivalentes de `tasks.md`; elección pendiente |
+| pytest / xUnit / pruebas de arquitectura | PHPUnit 12.5 y pruebas de dependencias | Evidencias equivalentes de `tasks.md`, incluida detección de una dependencia prohibida |
 | Frontend operativo | React en `app` | Recorrido de T-22 y autorizaciones comprobadas también en servidor |
 
 ## Distribución entre repositorios
@@ -44,14 +45,64 @@ No se incorporan por defecto tablas adicionales de usuarios/tokens/sesiones, IDs
 columnas `created_at`/`updated_at`, `DEFAULT`, estado de préstamo persistido ni cambios de códigos HTTP.
 El diseño existente usa seis tablas, UUID v4, JWT sin estado y fechas de negocio explícitas.
 
-## Decisiones que deben quedar cerradas antes del código
+## Versiones elegidas y entorno
 
-- Versiones de PHP, Laravel, React, runtime del frontend y herramientas de prueba, contrastadas con el entorno disponible.
-- Mapa concreto de carpetas y punto de composición, respetando dependencias hacia el dominio.
-- Testigo de concurrencia y protocolo para préstamos por socio y devoluciones simultáneas (D-04 a D-06).
-- Escenario de demostración de vencidos sin cambiar API ni plazo (D-07).
-- Alineación del reporte, transporte seguro y detalles incompletos del contrato (D-08, D-09, D-12).
-- Medición reproducible de RNF-1 y responsabilidad de la unicidad de socios (D-11, D-16).
+| Componente | Base elegida | Evidencia y reproducción |
+|---|---|---|
+| PHP | 8.4 | Runtime de contenedor; verificar extensiones de PostgreSQL y Argon2id |
+| Laravel | 13.x | Compatible con PHP 8.4; resolución exacta en `composer.lock` al implementar |
+| Composer | 2.x | Resolver y fijar dependencias sin ejecutar migraciones de paquetes ajenos |
+| PostgreSQL | 16.x | Motor exigido por el spec; fijar imagen/digest en la implementación |
+| PHPUnit | 12.5.x | Pruebas puras, aplicación, integración, HTTP y arquitectura |
+| React / React DOM | 19.2.x | Aplicación cliente; versiones iguales y resolución en `package-lock.json` |
+| Vite | 8.3.x | Compilación del frontend; fijar resolución de dependencias |
+| Node.js / npm | 26.5.0 / 11.17.0 | Versiones locales observadas; fijar el runtime equivalente de construcción |
 
-No se declara la documentación cerrada ni se inicia implementación como consecuencia de esta guía.
-Cada cierre debe enlazar la decisión, el requisito original y su futura evidencia de prueba.
+Fuentes contrastadas el 14 de octubre de 2026: [Laravel](https://laravel.com/docs/13.x/releases),
+[PHPUnit](https://docs.phpunit.de/en/12.5/installation.html),
+[React](https://react.dev/versions), [Vite](https://vite.dev/releases)
+y [requisitos de Node para Vite](https://vite.dev/guide/).
+Son versiones elegidas, no paquetes instalados ni una afirmación de ejecución satisfactoria.
+Los lockfiles e imágenes exactas se crean con la implementación y se conservan en sus repositorios.
+
+En la revisión local PHP y Composer no se encontraron en PATH. Docker tiene cliente 29.6.2,
+pero el servidor no está disponible. Antes de T-01 debe habilitarse el runtime previsto;
+la documentación no afirma que los contenedores ya funcionen.
+
+## Mapa de la futura implementación de `api`
+
+Este mapa no mueve ni renombra las carpetas existentes de las referencias Python/.NET.
+Define rutas nuevas únicamente para el código Laravel todavía no creado:
+
+```text
+app/
+  Library/
+    Domain/                   # entidades y valores PHP puros
+    Application/
+      Ports/                  # repositorios, Clock, hash, tokens, portadas y UnitOfWork
+      Services/               # un servicio por caso de uso
+    Adapters/
+      Inbound/Http/           # controladores, serialización y traducción de errores
+      Outbound/Persistence/   # repositorios, lectura agregada y transacciones PostgreSQL
+      Outbound/Security/      # hash y JWT
+      Outbound/Storage/       # portadas
+      Outbound/Clock/         # reloj real y fijo para demo/testing
+  Providers/
+    LibraryServiceProvider.php # único punto de composición del núcleo
+database/migrations/          # único dueño de DDL y categorías
+routes/api.php                # declaración de rutas hacia el adaptador HTTP
+tests/                        # dominio, aplicación, integración, contrato y arquitectura
+```
+
+`Domain` solo depende de PHP; `Application` depende del dominio y declara sus puertos;
+los adaptadores implementan esos puertos. Los tipos de Laravel/PDO no aparecen en firmas del núcleo.
+El punto de composición es el único que vincula puertos con adaptadores; los controladores reciben
+casos de uso mediante inyección. `UnitOfWork` expresa atomicidad desde la aplicación;
+los testigos y bloqueos quedan dentro del adaptador, sin filtrar tipos de PostgreSQL al dominio.
+
+Las pruebas de arquitectura deben fallar ante una dependencia prohibida del dominio/aplicación,
+un tipo de infraestructura en una firma del núcleo o composición fuera del punto establecido.
+Los modelos persistentes se distinguen de las entidades de dominio; heredar de Eloquent en el dominio viola la constitución.
+
+Las decisiones detalladas y sus pruebas requeridas están en [decisiones previas](decisiones-previas.md).
+La revisión del PR fija esta base documental; las tareas de implementación conservan estado pendiente.
