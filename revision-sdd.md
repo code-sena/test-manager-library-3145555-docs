@@ -80,3 +80,6 @@ La fecha de escritura de una evidencia retrospectiva debe reconocerse. Añadirla
 no demuestra que el análisis se hubiera documentado antes del código.
 Este procedimiento hace visible el razonamiento requerido por SDD; no impone TDD como
 una condición nueva del examen.
+
+Las comprobaciones documentales de este PR y sus límites se registran en
+[verificación SDD](verificacion-sdd.md).
