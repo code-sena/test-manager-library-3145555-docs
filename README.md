@@ -64,6 +64,9 @@ sus requisitos, justificar las decisiones y preparar sus escenarios de verificac
 Las auditorías iniciales mantienen su contexto histórico; el registro fecha la base de cada repositorio.
 La regla de entrega de las 11:00 a. m. se conserva: esta revisión documental es posterior al corte.
 
+La [segunda revisión de docs](segunda-revision-sdd.md) compara ambos specs y prepara
+las pruebas de las próximas correcciones de API, distinguiendo hallazgos y resultados ejecutados.
+
 En cualquiera de las dos carpetas, en este orden:
 
 1. `constitution.md` — principios innegociables.

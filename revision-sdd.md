@@ -83,3 +83,6 @@ una condición nueva del examen.
 
 Las comprobaciones documentales de este PR y sus límites se registran en
 [verificación SDD](verificacion-sdd.md).
+
+La [segunda revisión completa](segunda-revision-sdd.md) registra la explicación corregida
+de ADR-002, un caso de fechas pendiente de prueba y los escenarios previstos para corregir API.
