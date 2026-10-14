@@ -156,10 +156,13 @@ total positivo y rol válido. No se cambia la estructura de tablas ni se añade 
 checksum ISBN. Las expresiones SQL exactas y su evidencia vivirán en las migraciones de `api`;
 el inventario de reglas permanece en `data-model.md`, sin prometer aplicación actual en el motor.
 
-## Estado para continuar
+## Estado al cierre de la revisión previa
 
 Los hallazgos D-04 a D-09, D-11, D-12, D-14, D-16 y D-17 tienen decisiones documentales.
 D-13 y las observaciones singular/plural permanecen reportadas sin movimientos.
 La aceptación del PR fija esta base documental; no acredita ninguna tarea de implementación.
-Antes de ejecutar pruebas debe estar disponible el runtime previsto y el motor de Docker:
-en esta revisión PHP/Composer no se encontraron en PATH y Docker no respondió como servidor.
+En aquella revisión, antes de ejecutar pruebas debía estar disponible el runtime previsto
+y el motor de Docker: PHP/Composer no se encontraron en PATH y Docker no respondió como servidor.
+La evidencia posterior de implementación y ejecución se consulta en el [registro SDD](registro-sdd.md).
+Las decisiones C-01 a C-10 se mantienen; esta actualización distingue su adopción documental
+de las garantías que aún deben verificar los adaptadores.

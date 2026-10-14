@@ -1,6 +1,13 @@
 # Tareas — Manager Library (Python)
 
-Cada tarea termina cuando su **evidencia** existe y se puede ejecutar (artículo XII). Estado inicial de todas: **pendiente**.
+Cada tarea termina cuando su **evidencia** existe y se puede ejecutar (artículo XII).
+La tabla define el trabajo y su evidencia objetivo; el estado inicial era **pendiente**.
+El [registro vigente SDD](../registro-sdd.md) fecha los avances, las ejecuciones y sus límites.
+
+Las pruebas del dominio y de casos de uso con fakes acreditan ese nivel. Una historia que
+incluye respuestas HTTP, roles, unicidad real o seguridad conserva esas comprobaciones en
+T-12 a T-16. Las evidencias deben distinguir ambos alcances, sin cerrar la historia por una
+prueba del núcleo. El [procedimiento SDD](../revision-sdd.md) guía la preparación de cada avance.
 
 | # | Tarea | Depende de | Evidencia |
 |---|---|---|---|
@@ -10,7 +17,7 @@ Cada tarea termina cuando su **evidencia** existe y se puede ejecutar (artículo
 | T-04 | Dominio: `Book` (`Withdraw`, `Restock`, baja lógica) | T-03 | Pruebas: nunca < 0, nunca > total |
 | T-05 | Dominio: `Loan` (`AddItem`, `ReturnItem`, estado calculado, 14 días, máx. 3) | T-04 | Pruebas con un `Clock` falso: `open`, `overdue`, `closed` |
 | T-06 | Dominio: `Member` y `User`; puertos y casos de uso de socios (crear, buscar, consultar) | T-03 | `"Ana "` queda `ana`; rol válido; HU-05 y detalle de socio con conteo sin devolver pasan contra fakes (el rechazo por API se verifica en T-16) |
-| T-07 | Puertos y casos de uso de **autenticación** (`LoginService`, `CreateLibrarianService`) con fakes | T-06 | HU-01 y HU-02 pasan contra fakes |
+| T-07 | Puertos y casos de uso de **autenticación** (`LoginService`, `CreateLibrarianService`) con fakes | T-06 | Lógica de HU-01/HU-02 con fakes: vigencia de 8 h solicitada al emisor, error genérico, normalización y duplicados, actor admin y rol solicitado librarian; JWT/hash reales en T-14 y aceptación HTTP, incluido CA-01.3, en T-16 |
 | T-08 | Puertos y casos de uso de **libros** (crear, buscar, editar, baja, portada) con fakes | T-04 | HU-03 y HU-04 pasan contra fakes |
 | T-09 | Caso de uso **prestar** (`LendBooksService`) con fakes | T-05, T-08 | HU-06 completa: límites, vencidos, sin ejemplares |
 | T-10 | Casos de uso **devolver**, **consultar/listar préstamos** y **vencidos** | T-09 | HU-07, HU-08 y HU-09; devolver dos veces → `ITEM_ALREADY_RETURNED` |
@@ -41,5 +48,7 @@ La medición y la creación de tres vencidos están definidas en C-07 y C-04 de
 [decisiones previas](../decisiones-previas.md). No se amplía el contrato para satisfacer el sembrador.
 
 
-Todas las tareas conservan estado pendiente hasta disponer de su evidencia ejecutable.
+Cada tarea conserva estado pendiente hasta disponer de su evidencia ejecutable específica.
+El registro identifica los avances con evidencia y las garantías parciales; no certifica
+el sistema completo ni modifica las dependencias de esta tabla.
 Las precisiones de documentación no acreditan T-13, T-18, T-20 ni T-21.

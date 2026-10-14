@@ -2,6 +2,11 @@
 
 Fecha: 14 de octubre de 2026. Base revisada: commit `90860a3` del fork de documentación.
 
+Contexto histórico: este archivo conserva los hallazgos y verificaciones de los primeros
+PR documentales, anteriores a T-01. Las afirmaciones de repositorios vacíos, entorno local
+y tareas pendientes se refieren a esas revisiones. El seguimiento posterior está en el
+[registro SDD](registro-sdd.md); las correcciones del proceso están en la [revisión SDD](revision-sdd.md).
+
 Se revisaron el README y los doce documentos de cada versión (`spec-python/` y `spec-.net/`),
 incluidas las cuatro decisiones de arquitectura. Los otros cinco repositorios solo contienen su README.
 No existe todavía una aplicación ni una base implementada para contrastar el modelo.

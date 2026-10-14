@@ -57,6 +57,13 @@ pendientes sin modificar el alcance del producto ni renombrar entidades.
 El cierre propuesto de esos puntos está en [decisiones previas a la implementación](decisiones-previas.md).
 Una decisión documentada no equivale a una tarea de código terminada ni a una prueba ejecutada.
 
+El seguimiento de implementación está en el [registro vigente SDD](registro-sdd.md).
+La [revisión del proceso y plan de corrección](revision-sdd.md) distingue evidencias del núcleo,
+aceptación completa por API y resultados pendientes. Antes de continuar un avance, identificar
+sus requisitos, justificar las decisiones y preparar sus escenarios de verificación.
+Las auditorías iniciales mantienen su contexto histórico; el registro fecha la base de cada repositorio.
+La regla de entrega de las 11:00 a. m. se conserva: esta revisión documental es posterior al corte.
+
 En cualquiera de las dos carpetas, en este orden:
 
 1. `constitution.md` — principios innegociables.

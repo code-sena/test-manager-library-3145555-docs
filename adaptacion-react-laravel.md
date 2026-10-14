@@ -65,14 +65,17 @@ y [requisitos de Node para Vite](https://vite.dev/guide/).
 Son versiones elegidas, no paquetes instalados ni una afirmación de ejecución satisfactoria.
 Los lockfiles e imágenes exactas se crean con la implementación y se conservan en sus repositorios.
 
-En la revisión local PHP y Composer no se encontraron en PATH. Docker tiene cliente 29.6.2,
-pero el servidor no está disponible. Antes de T-01 debe habilitarse el runtime previsto;
-la documentación no afirma que los contenedores ya funcionen.
+Diagnóstico histórico anterior a T-01: PHP y Composer no se encontraron en PATH; Docker
+tenía cliente 29.6.2, pero su servidor no estaba disponible en esa revisión.
+La ejecución posterior en GitHub Actions y sus límites se registran en el
+[seguimiento vigente](registro-sdd.md). Ese diagnóstico inicial no describe por sí solo
+el estado actual del runtime local ni acredita el despliegue integrado.
 
-## Mapa de la futura implementación de `api`
+## Mapa de implementación de `api`
 
 Este mapa no mueve ni renombra las carpetas existentes de las referencias Python/.NET.
-Define rutas nuevas únicamente para el código Laravel todavía no creado:
+Define las rutas de destino de la adaptación Laravel; el estado de lo implementado
+se consulta en el registro SDD:
 
 ```text
 app/
@@ -105,4 +108,6 @@ un tipo de infraestructura en una firma del núcleo o composición fuera del pun
 Los modelos persistentes se distinguen de las entidades de dominio; heredar de Eloquent en el dominio viola la constitución.
 
 Las decisiones detalladas y sus pruebas requeridas están en [decisiones previas](decisiones-previas.md).
-La revisión del PR fija esta base documental; las tareas de implementación conservan estado pendiente.
+La revisión inicial del PR fijó esta base documental sin acreditar implementación.
+El [registro SDD](registro-sdd.md) distingue ahora lo probado, publicado y fusionado
+de las garantías que todavía requieren integración, HTTP o concurrencia.
