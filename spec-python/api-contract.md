@@ -106,6 +106,7 @@ implemente en Python o .NET. Qué hace cada operación está en [`spec.md`](spec
 | DELETE | `/books/{id}` | admin | Baja lógica |
 | PUT | `/books/{id}/cover` | admin | Sube portada (`multipart/form-data`, campo `file`) |
 | DELETE | `/books/{id}/cover` | admin | Quita la portada |
+| GET | `/books/{id}/cover` | autenticado | Devuelve el binario de la portada o 404 |
 
 Libro (respuesta):
 
@@ -142,7 +143,7 @@ Libro (respuesta):
 
 ```json
 // petición  (1 a 3 elementos, sin libros repetidos)
-{ "member_id": "…", "items": [ { "book_id": "…" }, { "book_id": "…" } ] }
+{ "member_id": "…", "items": [ { "book_id": "…" } ] }
 // 201
 {
   "id": "…", "member_id": "…", "loaned_at": "2026-10-14T14:15:00Z", "status": "open",

@@ -62,7 +62,14 @@ Los valores predeterminados de un futuro ORM no son evidencia de un defecto actu
 
 ## Condición para iniciar código
 
-Corregir D-01, D-02, D-03, D-10, la trazabilidad de D-11 y D-15; registrar el mapa de adaptación de D-14.
+**Correcciones documentales aplicadas:** D-01, D-02, D-03, D-10, la trazabilidad de D-11 y D-15,
+en ambas versiones. La guía `adaptacion-react-laravel.md` registra el mapa de responsabilidades
+de D-14; las versiones de herramientas y las rutas concretas siguen pendientes.
+
+**Verificación documental:** enlaces locales válidos; `spec.md`, `api-contract.md` y `data-model.md`
+equivalentes entre versiones; `spec.md`, las constituciones y los cuatro ADR sin cambios frente
+a la base. Se conservaron las seis tablas, columnas, rutas y nombres de carpetas.
+
 Resolver y documentar D-04 a D-09, D-12 y D-16 antes de programar los componentes afectados.
 La incoherencia de rutas D-13 y las observaciones de singular/plural quedan reportadas sin movimiento.
 Mientras existan estas decisiones pendientes, la documentación no se declara completamente cerrada.

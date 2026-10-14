@@ -50,6 +50,10 @@ endpoints); cambian las decisiones de tecnología. Ninguna de las dos es el stac
 
 ## Cómo se lee el spec
 
+Antes de implementar en este fork, leer la [auditoría documental](auditoria-documental.md) y la
+[adaptación a React y Laravel](adaptacion-react-laravel.md). Registran correcciones y decisiones
+pendientes sin modificar el alcance del producto ni renombrar entidades.
+
 En cualquiera de las dos carpetas, en este orden:
 
 1. `constitution.md` — principios innegociables.

@@ -9,6 +9,10 @@ al motor para saber qué hay, de qué tipo y con qué regla.
 Cada regla lleva una de **tres marcas**: **motor** (la impone la base), **solo dominio** (solo el código),
 **pendiente (T-xx)** (la pone esa tarea de [`tasks.md`](tasks.md)).
 
+**Estado inicial:** estas marcas describen el diseño objetivo, no restricciones ya verificadas.
+Los repositorios de implementación todavía no contienen migraciones. Una marca **motor** solo se
+acredita al ejecutar las consultas de §10 contra PostgreSQL; las pendientes de T-18 conservan su estado.
+
 ---
 
 ## 0. Convención de nombres
