@@ -106,6 +106,7 @@ implemente en Python o .NET. Qué hace cada operación está en [`spec.md`](spec
 | DELETE | `/books/{id}` | admin | Baja lógica |
 | PUT | `/books/{id}/cover` | admin | Sube portada (`multipart/form-data`, campo `file`) |
 | DELETE | `/books/{id}/cover` | admin | Quita la portada |
+| GET | `/books/{id}/cover` | autenticado | Devuelve el binario de la portada o 404 |
 
 Libro (respuesta):
 
@@ -142,7 +143,7 @@ Libro (respuesta):
 
 ```json
 // petición  (1 a 3 elementos, sin libros repetidos)
-{ "member_id": "…", "items": [ { "book_id": "…" }, { "book_id": "…" } ] }
+{ "member_id": "…", "items": [ { "book_id": "…" } ] }
 // 201
 {
   "id": "…", "member_id": "…", "loaned_at": "2026-10-14T14:15:00Z", "status": "open",
@@ -186,3 +187,113 @@ Una fila por `book_id + book_title + category_name` congelados. Orden: `times_bo
 | Autorización | Se evalúa en cada endpoint por rol; un 403 no revela si el recurso existe |
 | CORS | Solo el origen del frontend configurado por entorno |
 | Subida de portada | Solo `image/jpeg` y `image/png`, máx. 2 MB; el tipo se valida por contenido, no por extensión |
+
+## 5. Precisiones de serialización y validación (D-12)
+
+Estas decisiones completan formas y casos ya contemplados. No añaden endpoints ni operaciones
+sobre el producto. Los ejemplos anteriores con comentarios son ilustrativos: los comentarios
+no forman parte de las peticiones JSON que se envían.
+
+### 5.1. Entradas y campos del servidor
+
+| Operación | Campos de entrada requeridos | Respuesta de éxito |
+|---|---|---|
+| POST `/users` | `username`, `password`, `role` (solo `librarian`) | 201, objeto de usuario de §3.2 |
+| POST `/books` | `title`, `author`, `isbn`, `category_id`, `total_copies` | 201, objeto libro de §3.4 |
+| PUT `/books/{id}` | `title`, `author`, `category_id`, `total_copies` | 200, objeto libro de §3.4; ISBN no se edita |
+| DELETE `/books/{id}` | sin cuerpo | 204, sin cuerpo; mantiene las restricciones de baja lógica |
+| PUT `/books/{id}/cover` | multipart, campo `file` | 200, objeto libro con `cover_key` opaca |
+| DELETE `/books/{id}/cover` | sin cuerpo | 204, sin cuerpo; `cover_key` pasa a null |
+| POST `/members` | `full_name`, `document_number` | 201, objeto base de socio descrito abajo |
+| POST `/loans` | `member_id`, `items` (de 1 a 3 objetos con `book_id`) | 201, objeto préstamo de §3.6 con una línea por cada libro |
+| POST `/loans/{loan_id}/items/{item_id}/return` | sin cuerpo | 200, objeto de línea de §3.6 con `returned_at` |
+
+No se aceptan como entrada campos asignados por el servidor (`id`, `available_copies`,
+`cover_key`, fechas, `status`, valores congelados o usuario que registra el préstamo).
+Las entradas ajenas al esquema y tipos inválidos responden 422 `VALIDATION_ERROR`.
+Los textos obligatorios no pueden quedar vacíos después de normalizar; las longitudes máximas
+son las del modelo de datos. `password` es una cadena obligatoria no vacía: no se recorta,
+no se transforma y no se incorpora una política de complejidad nueva. `username` se recorta
+y pasa a minúsculas. El ISBN se valida por 13 dígitos, sin introducir checksum adicional.
+UUIDs mal formados son 422; UUIDs válidos sin recurso son 404. Los ejemplos con `…` son marcadores.
+
+### 5.2. Objetos y colecciones
+
+Objeto base de socio, usado al crear y en listas:
+
+```json
+{ "id": "…", "full_name": "María Pérez", "document_number": "123456" }
+```
+
+Detalle de socio, con el campo ya previsto en §3.5:
+
+```json
+{ "id": "…", "full_name": "María Pérez", "document_number": "123456", "active_loans": 2 }
+```
+
+`active_loans` cuenta **líneas sin devolver**, incluidas las vencidas; no cabeceras de préstamo.
+Se conserva su nombre aunque use plural y aunque el conteo represente libros.
+
+- GET `/books`, `/members` y `/loans` usan el sobre paginado de §1; cada elemento es el objeto
+  libro, socio base o préstamo de sus secciones. Préstamos incluyen todas sus líneas y el estado calculado.
+- GET `/categories` devuelve `{"items":[{"id":"…","name":"Ciencia"}]}` con las cinco categorías
+  ordenadas por nombre. La forma muestra un elemento ilustrativo; la respuesta real tiene los cinco.
+  Es una colección fija sin parámetros de paginación.
+- GET `/loans/overdue` devuelve `{"items":[...]}` con los campos exactos de §3.6, sin paginación
+  no especificada. Las listas vacías conservan `items: []`.
+- `page` y `size` son enteros positivos, por defecto 1 y 20; `size` mayor que 50 es 422.
+  Una página posterior al último resultado devuelve `items: []` y el total real, no 404.
+- Empates de libros se ordenan por título e ID; préstamos por fecha descendente e ID;
+  vencidos por días de retraso descendentes, luego `due_at` ascendente e `item_id`.
+
+La ruta literal `/loans/overdue` se resuelve antes que `/loans/{id}`.
+La pertenencia de `item_id` al `loan_id` se valida: una línea de otro préstamo es 404.
+GET de portada devuelve bytes con Content-Type `image/jpeg` o `image/png`; los errores mantienen JSON.
+React solicita el binario con Bearer y lo muestra mediante una URL de objeto temporal; no se coloca
+el JWT en la URL ni se interpreta `cover_key` como dirección pública.
+
+### 5.3. Fechas, vencimiento y conteos
+
+`from` y `to` son fechas `YYYY-MM-DD`. En préstamos son filtros opcionales sobre `loaned_at`;
+en reporte son obligatorios. Ambos extremos son inclusivos: se traduce el final a un límite
+exclusivo del inicio del día siguiente en UTC. Fecha inválida es 422 `VALIDATION_ERROR`;
+rango invertido es 422 `INVALID_DATE_RANGE`. El filtro `status` admite `open`, `overdue`, `closed`.
+
+Una línea está vencida solo si `returned_at` es null y `due_at < Clock.now()`; la igualdad no vence.
+`days_late` es el número entero de periodos completos de 24 horas desde `due_at`, calculado
+como floor de segundos de retraso / 86400. Una línea vencida hace menos de 24 horas muestra 0;
+sigue vencida por el instante, no por ese entero. No se almacena ninguno de esos valores.
+
+`MEMBER_LIMIT_EXCEEDED` conserva el sobre único; `details` informa el conteo actual sin agregar
+un campo nuevo al sobre, por ejemplo:
+
+```json
+{
+  "code": "MEMBER_LIMIT_EXCEEDED",
+  "message": "El préstamo superaría el máximo de 3 libros sin devolver.",
+  "details": [{ "field": "items", "issue": "El socio tiene actualmente 2 libros sin devolver." }]
+}
+```
+
+### 5.4. Errores de autenticación y técnicos
+
+| `code` | Estado | Caso |
+|---|---|---|
+| `UNAUTHENTICATED` | 401 | Bearer ausente, inválido o vencido; mismo mensaje genérico |
+| `CONCURRENT_MODIFICATION` | 409 | Conflicto de escritura que persiste tras el reintento completo; en préstamos se conserva ADR-002 y `BOOK_NOT_AVAILABLE` |
+| `METHOD_NOT_ALLOWED` | 405 | Método no permitido en una ruta existente |
+| `INTERNAL_ERROR` | 500 | Error inesperado o defecto de integridad; mensaje genérico sin trazas |
+
+`INVALID_CREDENTIALS` permanece para login incorrecto, sin revelar qué dato falló.
+Los códigos técnicos completan el sobre de error; no añaden una funcionalidad de producto.
+La API evalúa autenticación y rol antes de revelar existencia de un recurso protegido.
+JSON mal formado se traduce a 422 `VALIDATION_ERROR`; rutas inexistentes a 404 `NOT_FOUND`.
+Los errores de framework nunca se devuelven con su formato por defecto. Un fallo CHECK no es
+un conflicto de disponibilidad normal. No se transforma indiscriminadamente todo error de la base en 409.
+
+### 5.5. Transporte
+
+Todas las llamadas de credenciales y su evidencia de aceptación usan HTTPS con confianza TLS
+validada por el cliente. La terminación TLS se configura en `infra`; los secretos no se incluyen
+en ejemplos reales, commits ni logs. La interpretación y evidencia de RNF-3 están en
+[C-06](../decisiones-previas.md). El cuerpo de login de §3.1 se conserva.
