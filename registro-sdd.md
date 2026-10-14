@@ -147,6 +147,14 @@ Los nombres de método citados existen en los archivos enlazados.
 | XI | Código en inglés, documentación/mensajes en español | Mantener; commits y PR en inglés por preferencia de la usuaria |
 | XII | Evidencias reproducibles por etapa | SDD-01/02/05: registrar alcance preciso y separar evidencia de tarea de aceptación completa |
 
+## Hallazgos de la segunda revisión
+
+La [segunda revisión](segunda-revision-sdd.md) conserva la foto de bases y resultados de este
+registro. Añade SDD-08 (explicación de bloqueo de fila corregida), SDD-09 (fecha con byte
+nulo pendiente de prueba/corrección en API) y SDD-10 (umbral en bytes de portada pendiente
+de precisión). La evidencia parcial de DateRange no cierra el nuevo caso de entrada inválida.
+Las fuentes técnicas y los escenarios de corrección se enlazan en ese informe.
+
 ## Corte de entrega
 
 El README fija 2026-10-14 a las 11:00, America/Bogota, equivalente a 16:00 UTC.
